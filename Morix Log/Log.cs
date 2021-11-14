@@ -290,21 +290,6 @@ namespace Morix
             }
         }
 
-        public static void Write(string filename, string content)
-        {
-            try
-            {
-                filename = string.Format(@"{0}\{1}.txt", _dir, filename);
-
-                using (StreamWriter sw = File.AppendText(filename))
-                    sw.WriteLine(content);
-            }
-            catch (Exception ex)
-            {
-                InternalError(ex);
-            }
-        }
-
         public static void WriteCallingMethod()
         {
             try
