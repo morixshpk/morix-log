@@ -145,7 +145,9 @@ namespace Morix
                     var sb = new StringBuilder();
                     sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
                     sb.AppendLine(ex.ToString());
-                    System.IO.File.AppendAllText(file, sb.ToString());
+
+                    using (StreamWriter sw = File.AppendText(file))
+                        sw.WriteLine(sb.ToString());
                 }
                 catch (Exception ex1)
                 {
@@ -186,7 +188,9 @@ namespace Morix
                     sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
                     sb.AppendLine("Note: " + note);
                     sb.AppendLine(ex.ToString());
-                    System.IO.File.AppendAllText(file, sb.ToString());
+
+                    using (StreamWriter sw = File.AppendText(file))
+                        sw.WriteLine(sb.ToString());
                 }
                 catch (Exception ex1)
                 {
@@ -226,7 +230,9 @@ namespace Morix
                     var sb = new StringBuilder();
                     sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
                     sb.AppendLine(content);
-                    System.IO.File.AppendAllText(file, sb.ToString());
+
+                    using (StreamWriter sw = File.AppendText(file))
+                        sw.WriteLine(sb.ToString());
                 }
                 catch (Exception ex)
                 {
@@ -273,7 +279,9 @@ namespace Morix
                         sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
                         sb.AppendLine(content);
                     }
-                    System.IO.File.AppendAllText(file, sb.ToString());
+
+                    using (StreamWriter sw = File.AppendText(file))
+                        sw.WriteLine(sb.ToString());
                 }
                 catch (Exception ex)
                 {
@@ -287,7 +295,9 @@ namespace Morix
             try
             {
                 filename = string.Format(@"{0}\{1}.txt", _dir, filename);
-                System.IO.File.WriteAllText(filename, content);
+
+                using (StreamWriter sw = File.AppendText(filename))
+                    sw.WriteLine(content);
             }
             catch (Exception ex)
             {
