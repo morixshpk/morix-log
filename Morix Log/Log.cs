@@ -58,7 +58,12 @@ namespace Morix
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
             var uri = new UriBuilder(codeBase);
             var path = Uri.UnescapeDataString(uri.Path);
-            var dir = Path.Combine(Path.GetDirectoryName(path), "Logs");
+
+            var dir = Path.Combine(Path.GetDirectoryName(path), "..\\App_Data");
+            if (Directory.Exists(dir))
+                dir = Path.Combine(Path.GetDirectoryName(path), "..\\App_Data\\Logs");
+            else
+                dir = Path.Combine(Path.GetDirectoryName(path), "Logs");
 
             Dir = dir;
             NoDays = 30;
@@ -147,7 +152,10 @@ namespace Morix
                     sb.AppendLine(ex.ToString());
 
                     using (StreamWriter sw = File.AppendText(file))
+                    {
                         sw.WriteLine(sb.ToString());
+                        sw.Close();
+                    }
                 }
                 catch (Exception ex1)
                 {
@@ -190,7 +198,10 @@ namespace Morix
                     sb.AppendLine(ex.ToString());
 
                     using (StreamWriter sw = File.AppendText(file))
+                    {
                         sw.WriteLine(sb.ToString());
+                        sw.Close();
+                    }
                 }
                 catch (Exception ex1)
                 {
@@ -232,7 +243,10 @@ namespace Morix
                     sb.AppendLine(content);
 
                     using (StreamWriter sw = File.AppendText(file))
+                    {
                         sw.WriteLine(sb.ToString());
+                        sw.Close();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -281,7 +295,10 @@ namespace Morix
                     }
 
                     using (StreamWriter sw = File.AppendText(file))
+                    {
                         sw.WriteLine(sb.ToString());
+                        sw.Close();
+                    }
                 }
                 catch (Exception ex)
                 {

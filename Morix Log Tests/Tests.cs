@@ -24,8 +24,6 @@ namespace Morix
 
                 Morix.Log.Error(new Exception("Hello exception"), "exception with note");
 
-                Morix.Log.Write("Write", "Append to write.txt");
-
                 Morix.Log.Custom("Write", "Custom log");
                 Morix.Log.Custom("Write", "Custom log same line", true);
 
