@@ -26,6 +26,7 @@ namespace Morix
 
                 Morix.Log.Custom("Write", "Custom log");
                 Morix.Log.Custom("Write", "Custom log same line", true);
+                Morix.Log.Custom("Write", "Custom log same line", true);
 
                 Morix.Log.WriteCallingMethod();
 

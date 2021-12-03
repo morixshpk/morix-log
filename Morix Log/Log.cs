@@ -296,7 +296,7 @@ namespace Morix
 
                     using (StreamWriter sw = File.AppendText(file))
                     {
-                        sw.WriteLine(sb.ToString());
+                        sw.Write(sb.ToString());
                         sw.Close();
                     }
                 }
