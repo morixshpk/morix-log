@@ -255,6 +255,12 @@ namespace Morix
             }
         }
 
+        /// <summary>
+        /// Log to custom filename
+        /// </summary>
+        /// <param name="filename">Filename where logs will be writen. Example 'mylog' and file will be create mylog.txt</param>
+        /// <param name="content">Content to be write to file</param>
+        /// <param name="sameLine">SameLine or in different line. Basically Write or WriteLine</param>
         public static void Custom(string filename, string content, bool sameLine = false)
         {
             lock (_sync)
