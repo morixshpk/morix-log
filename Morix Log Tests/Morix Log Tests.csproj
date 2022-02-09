@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Morix</RootNamespace>
     <AssemblyName>Morix.Log.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Morix Log\Morix Log.csproj">
-      <Project>{c5aa425a-d988-44d3-8622-fdee10103b10}</Project>
+      <Project>{09a7d44f-a335-458c-851a-30a02a47789e}</Project>
       <Name>Morix Log</Name>
     </ProjectReference>
   </ItemGroup>
