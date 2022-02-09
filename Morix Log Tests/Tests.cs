@@ -44,6 +44,9 @@ namespace Morix
 
                 Morix.Log.Custom("Write", "Custom log 2");
                 Morix.Log.Custom("Write", "Custom log same line 2", true);
+
+                Exception ex = null;
+                Morix.Log.Error(ex);
             }
             catch (Exception ex)
             {

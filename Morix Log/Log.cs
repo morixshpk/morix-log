@@ -219,11 +219,8 @@ namespace Morix
         {
             try
             {
-                using (EventLog eventLog = new EventLog("Application"))
-                {
-                    eventLog.Source = "Morix.Log";
-                    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
-                }
+                var lw = GetLogWwriter("MorixLogInternalErros");
+                lw.Write(ex.ToString());
             }
             catch
             {
