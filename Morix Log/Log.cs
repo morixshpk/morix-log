@@ -14,15 +14,13 @@ namespace Morix
     public static class Log
     {
         private static readonly object _sync = new object();        
-
-        private static int _versioningNo = 0;
-        private static readonly long _maxSize = 100000000;
-        private static DateTime _date = DateTime.Now.Date;
+        private static readonly Dictionary<string, LogWriter> _logWriters = new Dictionary<string, LogWriter>();
 
         private static readonly Timer _timer;
-
         private static string _dir = "";
         private static int _noDays = 30;
+
+        public const long MaxSize = 100000000;
 
         public static string Dir
         {
@@ -82,8 +80,42 @@ namespace Morix
 
             _timer = new Timer();
             _timer.Elapsed += Timer_Elapsed;
-            _timer.Interval = TimeSpan.FromHours(12).TotalMilliseconds;
+            _timer.Interval = TimeSpan.FromHours(6).TotalMilliseconds;
             _timer.Start();
+        }
+
+        private static LogWriter GetLogWwriter(string fileName)
+        {
+            lock (_sync)
+            {
+                _logWriters.TryGetValue(fileName, out var writer);
+
+                if (writer == null)
+                {
+                    writer = new LogWriter { FileName = fileName };
+                    _logWriters[fileName] = writer;
+                }
+
+                return writer;
+            }
+        }
+
+        private static void DeleteOldWriters()
+        {
+            var dt = DateTime.Now.AddMinutes(30);
+            lock (_sync)
+            {
+                var _files = new HashSet<string>();
+
+                foreach (var logWriter in _logWriters.Values)
+                {
+                    if (logWriter.LastWriteDateTime < dt)
+                        _files.Add(logWriter.FileName);
+                }
+
+                foreach (var file in _files)
+                    _logWriters.Remove(file);
+            }
         }
 
         private static void DeleteOldFiles()
@@ -111,147 +143,56 @@ namespace Morix
                 InternalError(ex);
             }
         }
-
+               
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _timer.Stop();
+            DeleteOldWriters();
             DeleteOldFiles();
             _timer.Start();
         }
 
         public static void Error(Exception ex)
         {
-            lock (_sync)
+            try
             {
-                try
-                {
-                    if (_date != DateTime.Now.Date)
-                    {
-                        _versioningNo = 0;
-                        _date = DateTime.Now.Date;
-                    }
-                    string file = string.Format(@"{0}\Error-{1:yyyy-MM-dd}-{2}.txt", _dir, _date, _versioningNo);
-                    FileInfo fi = new FileInfo(file);
-
-                    while (fi.Exists)
-                    {
-                        if (fi.Length > _maxSize)
-                        {
-                            _versioningNo++;
-                            file = string.Format(@"{0}\Error-{1:yyyy-MM-dd}-{2}.txt", _dir, _date, _versioningNo);
-                            fi = new FileInfo(file);
-                            if (fi.Exists)
-                                continue;
-                        }
-                        else
-                            break;
-                    }
-
-                    var sb = new StringBuilder();
-                    sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
-                    sb.AppendLine(ex.ToString());
-
-                    using (StreamWriter sw = File.AppendText(file))
-                    {
-                        sw.WriteLine(sb.ToString());
-                        sw.Close();
-                    }
-                }
-                catch (Exception ex1)
-                {
-                    InternalError(ex1);
-                }
+                var lw = GetLogWwriter("Error");
+                lw.Write(ex.ToString());
+            }
+            catch (Exception ex1)
+            {
+                InternalError(ex1);
             }
         }
 
         public static void Error(Exception ex, string note)
         {
-            lock (_sync)
+
+            try
             {
-                try
-                {
-                    if (_date != DateTime.Now.Date)
-                    {
-                        _versioningNo = 0;
-                        _date = DateTime.Now.Date;
-                    }
-                    string file = string.Format(@"{0}\Error-{1:yyyy-MM-dd}-{2}.txt", _dir, _date, _versioningNo);
-                    FileInfo fi = new FileInfo(file);
+                var sb = new StringBuilder();
+                sb.AppendLine("Note: " + note);
+                sb.Append(ex.ToString());
 
-                    while (fi.Exists)
-                    {
-                        if (fi.Length > _maxSize)
-                        {
-                            _versioningNo++;
-                            file = string.Format(@"{0}\Error-{1:yyyy-MM-dd}-{2}.txt", _dir, _date, _versioningNo);
-                            fi = new FileInfo(file);
-                            if (fi.Exists)
-                                continue;
-                        }
-                        else
-                            break;
-                    }
-
-                    var sb = new StringBuilder();
-                    sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
-                    sb.AppendLine("Note: " + note);
-                    sb.AppendLine(ex.ToString());
-
-                    using (StreamWriter sw = File.AppendText(file))
-                    {
-                        sw.WriteLine(sb.ToString());
-                        sw.Close();
-                    }
-                }
-                catch (Exception ex1)
-                {
-                    InternalError(ex1);
-                }
+                var lw = GetLogWwriter("Error");
+                lw.Write(sb.ToString());
+            }
+            catch (Exception ex1)
+            {
+                InternalError(ex1);
             }
         }
 
         public static void Debug(string content)
         {
-            lock (_sync)
+            try
             {
-                try
-                {
-                    if (_date != DateTime.Now.Date)
-                    {
-                        _versioningNo = 0;
-                        _date = DateTime.Now.Date;
-                    }
-                    string file = string.Format(@"{0}\Debug-{1:yyyy-MM-dd}-{2}.txt", _dir, _date, _versioningNo);
-                    FileInfo fi = new FileInfo(file);
-
-                    while (fi.Exists)
-                    {
-                        if (fi.Length > _maxSize)
-                        {
-                            _versioningNo++;
-                            file = string.Format(@"{0}\Debug-{1:yyyy-MM-dd}-{2}.txt", _dir, _date, _versioningNo);
-                            fi = new FileInfo(file);
-                            if (fi.Exists)
-                                continue;
-                        }
-                        else
-                            break;
-                    }
-
-                    var sb = new StringBuilder();
-                    sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
-                    sb.AppendLine(content);
-
-                    using (StreamWriter sw = File.AppendText(file))
-                    {
-                        sw.WriteLine(sb.ToString());
-                        sw.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    InternalError(ex);
-                }
+                var lw = GetLogWwriter("Debug");
+                lw.Write(content);
+            }
+            catch (Exception ex1)
+            {
+                InternalError(ex1);
             }
         }
 
@@ -263,67 +204,14 @@ namespace Morix
         /// <param name="sameLine">SameLine or in different line. Basically Write or WriteLine</param>
         public static void Custom(string filename, string content, bool sameLine = false)
         {
-            lock (_sync)
-            {
-                try
-                {
-                    if (_date != DateTime.Now.Date)
-                    {
-                        _versioningNo = 0;
-                        _date = DateTime.Now.Date;
-                    }
-                    string file = string.Format(@"{0}\{1}-{2:yyyy-MM-dd}-{3}.txt", _dir, filename, _date, _versioningNo);
-                    FileInfo fi = new FileInfo(file);
-
-                    while (fi.Exists)
-                    {
-                        if (fi.Length > _maxSize)
-                        {
-                            _versioningNo++;
-                            file = string.Format(@"{0}\{1}-{2:yyyy-MM-dd}-{3}.txt", _dir, filename, _date, _versioningNo);
-                            fi = new FileInfo(file);
-                            if (fi.Exists)
-                                continue;
-                        }
-                        else
-                            break;
-                    }
-
-                    var sb = new StringBuilder();
-                    if (sameLine)
-                    {
-                        sb.AppendLine(DateTime.Now.ToString("HH:mm:ss.fff") + ":" + content);
-                    }
-                    else
-                    {
-                        sb.AppendLine("----------" + DateTime.Now.ToString("HH:mm:ss.fff") + "----------");
-                        sb.AppendLine(content);
-                    }
-
-                    using (StreamWriter sw = File.AppendText(file))
-                    {
-                        sw.Write(sb.ToString());
-                        sw.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    InternalError(ex);
-                }
-            }
-        }
-
-        public static void WriteCallingMethod()
-        {
             try
             {
-                var frame = new System.Diagnostics.StackFrame(1);
-                var method = frame.GetMethod();
-                Custom("Method", "Executed " + method.DeclaringType.Name + "." + method.Name, true);
+                var lw = GetLogWwriter(filename);
+                lw.Write(content, sameLine);
             }
-            catch(Exception ex)
+            catch (Exception ex1)
             {
-                InternalError(ex);
+                InternalError(ex1);
             }
         }
 
